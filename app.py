@@ -1,37 +1,31 @@
 import streamlit as st
 import pandas as pd
 import pickle
-import os
 
-# Set the path for the model file
-model_path = "model L.pkl"  # Ensure this matches your actual file name and extension
+# Correct the model path
+model_path = "rf_model L.pkl"  # Update to match your model file
 
-# Debugging: Display the current working directory
-st.write(f"Current Working Directory: {os.getcwd()}")
-
-# Load the model
+# Try loading the model
 try:
     with open(model_path, "rb") as file:
         model = pickle.load(file)
-    # Ensure the model has a predict method
-    if not hasattr(model, "predict"):
-        st.error("The loaded object is not a valid model. Please check the model file.")
 except FileNotFoundError:
-    st.error(f"Model file not found at: {model_path}. Please ensure it is in the correct directory.")
-    st.stop()
+    st.error("Model file not found. Please ensure 'rf_model L.pkl' is in the correct directory.")
 except Exception as e:
     st.error(f"An error occurred while loading the model: {e}")
-    st.stop()
+
+# Check if model has the .predict() method
+if not hasattr(model, 'predict'):
+    st.error("Loaded object is not a valid model. Check 'rf_model L.pkl'.")
 
 # App title
-st.title("Employee Performance Prediction")
+st.title("Model Deployment with Streamlit")
 
 # Sidebar for user input
 st.sidebar.header("Input Parameters")
 
 # Function to get user input for the dataset
 def user_input_features():
-    # Sidebar inputs for user features
     Age = st.sidebar.number_input("Age", min_value=18, max_value=65, step=1)
     Gender = st.sidebar.selectbox("Gender", ["Male", "Female"])
     EducationBackground = st.sidebar.selectbox("Education Background", ["Science", "Commerce", "Arts", "Others"])
@@ -93,17 +87,15 @@ def user_input_features():
 
 
 # Load user input
-input_features = user_input_features()
+inx = user_input_features()
 
 # Display input
 st.subheader("User Input:")
-st.write(input_features)
+st.write(inx)
 
 # Make prediction
 if st.button("Predict"):
-    try:
-        prediction = model.predict(input_features)
-        st.subheader("Prediction:")
-        st.write(prediction[0])
-    except Exception as e:
-        st.error(f"An error occurred during prediction: {e}")
+    prediction = model.predict(inx)
+    st.subheader("Prediction:")
+    st.write(prediction[0])
+
